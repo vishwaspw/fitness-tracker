@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import time
-import poseEstimationModule as pem
+import pose as pem 
 
 cap = cv2.VideoCapture(0)
 pTime = 0
