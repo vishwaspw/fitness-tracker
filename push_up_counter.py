@@ -56,7 +56,6 @@ class poseDetector():
         return angle
 
 
-# === push_up_counter.py ===
 
 cap = cv2.VideoCapture(0)
 pTime = 0
@@ -114,3 +113,6 @@ while True:
     
     cv2.imshow("Image", img)
     cv2.waitKey(1)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
