@@ -80,18 +80,18 @@ while True:
             per = (0 if per < 0 else 100 if per > 100 else per)
             bar = np.interp(per, (0, 100), (650, 100))
             
-            if per == 100:
+            if per >= 95:
                 if dir == 0:
                     count += 0.5
                     dir = 1
-            elif per == 0:
+            elif per <= 5:
                 if dir == 1:
                     count += 0.5
                     dir = 0
-                    
+
             img = cv2.flip(img, 1)
             
-            if (per == 100 or per == 0):
+            if (per >= 95 or per <= 5):
                 cv2.putText(img, f'{int(per)}%', (1200, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
             else:
                 cv2.putText(img, f'{int(per)}%', (1200, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
