@@ -69,7 +69,6 @@ while True:
     lmList = detector.findPosition(img, draw=False)
 
     if (len(lmList)):
-        print(lmList[31][2], lmList[29][2])
         if (lmList[31][2] + 50 > lmList[29][2] and lmList[32][2] + 50 > lmList[30][2]):
             angle = detector.findAngle(img, 11, 13, 15)
             detector.findAngle(img, 12, 14, 16)
