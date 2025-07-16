@@ -1,175 +1,117 @@
-# Push-Up Counter with Pose Detection
+# Fitness Tracker with Pose Detection
 
-This project uses **MediaPipe** and **OpenCV** to build an intelligent push-up counter that uses **pose estimation** to track body joints and count reps in real time. It's an excellent example of how computer vision can be used in fitness and health applications.
-
----
-
-## 📦 File Included
-
-### `push_up_counter.py`
-This single file handles everything:
-- Captures webcam feed
-- Detects human pose
-- Monitors joint angles
-- Converts elbow angle to progress percentage
-- Counts reps
-- Visualizes feedback
+This project uses **MediaPipe** and **OpenCV** to build an intelligent exercise tracker that uses **pose estimation** to track body joints and count reps in real time. It's an excellent example of how computer vision can be used in fitness and health applications.
 
 ---
 
-## 🧠 How the Project Works (Detailed Code Walkthrough)
+## 🏋️‍♂️ Features
+- Real-time pose detection for multiple exercises (Push-ups, Squats)
+- Form correction feedback
+- Repetition counting
+- Performance analytics
+- Cross-platform compatibility
 
-### 1. Import Libraries
-```python
-import cv2
-import numpy as np
-import time
-import pose as pem
+## 📦 Project Structure
 ```
-- `cv2`: OpenCV for image processing and webcam access
-- `numpy`: Used for interpolating bar height
-- `time`: To measure FPS
-- `pose`: A helper module (`pose.py`) that detects body pose and calculates angles
-
-### 2. Setup Video and Variables
-```python
-cap = cv2.VideoCapture(0)
-pTime = 0
-
-detector = pem.poseDetector(detectionCon=0.8)
-count, dir, bar, per = 0, 0, 0, 0
+fitness-tracker/
+├── exercises/           # Exercise implementations
+│   ├── base_exercise.py # Base exercise class
+│   ├── squat_counter.py # Squat counter implementation
+│   └── pushup_counter.py# Push-up counter implementation
+├── models/              # ML models
+│   └── pose_estimator.py# Pose estimation logic
+├── utils/               # Utility functions
+│   ├── ui_utils.py      # UI drawing utilities
+│   └── file_utils.py    # File operation utilities
+├── main.py              # Main application
+└── requirements.txt     # Python dependencies
 ```
-- Open the webcam
-- Initialize the pose detector with higher accuracy
-- Initialize the push-up rep counter (`count`), movement direction flag (`dir`), and progress values (`per`, `bar`)
 
-### 3. Start Webcam Loop
+## 🧠 How the Project Works (Detailed Walkthrough)
+
+### 1. Pose Detection
+- Uses MediaPipe's pose estimation model to detect 33 key body points
+- Tracks joints in real-time with high accuracy
+- Processes each frame to analyze body position
+
+### 2. Exercise Recognition
+- Detects specific exercise patterns (push-ups, squats)
+- Monitors joint angles and positions
+- Provides real-time feedback on form
+
+### 3. Rep Counting Logic
 ```python
-while True:
-    success, img = cap.read()
-    img = cv2.resize(img, (1366, 780))
+# Simplified rep counting logic
+if per >= 95:  # Down position
+    if dir == 0:
+        count += 0.5
+        dir = 1
+elif per <= 5:  # Up position
+    if dir == 1:
+        count += 0.5
+        dir = 0
 ```
-- Read and resize each frame to a fixed resolution
+- Tracks full range of motion
+- Prevents false counts
+- Adjustable sensitivity
 
-### 4. Pose Estimation and Landmark Extraction
-```python
-    img = detector.findPose(img, draw=False)
-    lmList = detector.findPosition(img, draw=False)
+### 4. Real-time Feedback
+- Visual progress bar
+- Form correction hints
+- Repetition counter
+- FPS display
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.7+
+- Webcam
+- Required packages (install via `requirements.txt`)
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/vishwaspw/fitness-tracker.git
+cd fitness-tracker
+
+# Install dependencies
+pip install -r requirements.txt
 ```
-- Detect body pose
-- Extract landmarks (joint positions) as a list
 
-### 5. Check Body Position (Legs Extended)
-```python
-    if (lmList[31][2] + 50 > lmList[29][2] and lmList[32][2] + 50 > lmList[30][2]):
+### Usage
+```bash
+# Start with push-ups
+python main.py --exercise pushup
+
+# Or try squats
+python main.py --exercise squat
 ```
-- Ensure ankles are below knees (to confirm proper push-up position)
-
-### 6. Calculate Angles
-```python
-        angle = detector.findAngle(img, 11, 13, 15)  # Left arm
-        detector.findAngle(img, 12, 14, 16)           # Right arm
-        detector.findAngle(img, 27, 29, 31)           # Left leg
-        detector.findAngle(img, 28, 30, 32)           # Right leg
-```
-- Calculate elbow and knee angles
-
-### 7. Convert Angle to Percentage
-```python
-        per = -1.25 * angle + 212.5
-        per = (0 if per < 0 else 100 if per > 100 else per)
-```
-- Maps elbow angle to push-up progress percentage (0% up, 100% down)
-
-### 8. Map Percentage to Bar Height
-```python
-        bar = np.interp(per, (0, 100), (650, 100))
-```
-- Converts progress to bar height on screen
-
-### 9. Count Push-Ups
-```python
-        if per >= 95:
-            if dir == 0:
-                count += 0.5
-                dir = 1
-        elif per <= 5:
-            if dir == 1:
-                count += 0.5
-                dir = 0
-```
-- Toggle `dir` to ensure a full push-up cycle is counted
-- Adds 0.5 when going down and 0.5 when coming back up
-
-### 10. Visual Feedback (Flipped Image)
-```python
-        img = cv2.flip(img, 1)
-```
-- Flip image like a mirror for natural orientation
-
-### 11. Show Percentage and Bar
-```python
-        if (per == 100 or per == 0):
-            cv2.putText(... green)
-        else:
-            cv2.putText(... red)
-        cv2.rectangle(... bar background)
-        cv2.rectangle(... bar fill)
-```
-- Show percentage and fill the bar according to progress
-
-### 12. Else: Prompt to Get in Position
-```python
-    else:
-        img = cv2.flip(img, 1)
-        cv2.rectangle(... 'Take your position')
-```
-- Display a message if the user is not in proper pose
-
-### 13. Display Count and FPS
-```python
-    cv2.rectangle(... count)
-    cv2.putText(... count)
-
-    cTime = time.time()
-    fps = 1 / (cTime - pTime)
-    pTime = cTime
-    cv2.putText(... fps)
-```
-- Display total count and frame rate
-
-### 14. Show Image
-```python
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
-```
-- Display the final result with all visuals
-
----
 
 ## ✅ Project Summary
 | Feature | Description |
-|--------|-------------|
+|---------|-------------|
 | Library | MediaPipe, OpenCV, NumPy |
 | Input | Live webcam video feed |
-| Output | Pose landmarks, bar chart, rep count |
+| Output | Pose landmarks, progress bar, rep count |
 | ML Model | MediaPipe Pose Estimation |
 | Applications | Fitness, Rehab, Posture Correction |
-
----
 
 ## 🚀 Future Ideas
 - Add sound feedback for each rep
 - Save history of workout sessions
-- Detect poor form (e.g., bent knees)
+- Detect poor form (e.g., bent knees, arched back)
 - Export stats (CSV, Graphs)
+- Support for more exercises
+
+## 👏 Credits
+- Original concept and implementation: [Abdelkareem Hossam](https://github.com/abdelkareem-ahmed)
+- Enhanced and modularized by: [Vishwas R](https://github.com/vishwaspw)
+- Squat counter implementation: [Vishwas R](https://github.com/vishwaspw)
+
+## 🙏 Acknowledgments
+- Thanks to the MediaPipe team for their amazing pose estimation model
+- Inspired by the fitness technology community
 
 ---
 
-## 👨‍💻 Credits
-Developed by Abdelkareem Hossam, using MediaPipe Pose and OpenCV.
-
-🎥 I will be publishing a full video explaining every single line of this code. If you use this project, don't forget to mention me and fork the repo.
-
-Feel free to improve or extend it for other exercises like squats, jumping jacks, or yoga!
-
+*Feel free to improve or extend it for other exercises like jumping jacks, pull-ups, or yoga!*
