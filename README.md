@@ -1,88 +1,117 @@
-# Squat Counter with Pose Detection
+# Fitness Tracker with Pose Detection
 
-A real-time squat counter application that uses computer vision to track and analyze your squats. Built with Python, OpenCV, and MediaPipe.
+This project uses **MediaPipe** and **OpenCV** to build an intelligent exercise tracker that uses **pose estimation** to track body joints and count reps in real time. It's an excellent example of how computer vision can be used in fitness and health applications.
 
-![Demo](assets/demo.gif)
+---
 
-## Features
+## 🏋️‍♂️ Features
+- Real-time pose detection for multiple exercises (Push-ups, Squats)
+- Form correction feedback
+- Repetition counting
+- Performance analytics
+- Cross-platform compatibility
 
-- 🏋️ Real-time squat counting with pose estimation
-- 📊 Performance metrics (reps, depth, form analysis)
-- 🎯 Form feedback and correction
-- 📈 Session history and progress tracking
-- 🎮 Simple keyboard controls
-- 📱 Responsive UI with zoom functionality
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/squat-counter.git
-   cd squat-counter
-   ```
-
-2. Create and activate a virtual environment (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Usage
-
-1. Run the application:
-   ```bash
-   python main.py
-   ```
-
-2. Position yourself:
-   - Stand 6-8 feet away from your webcam
-   - Ensure good lighting
-   - Make sure your full body is visible
-
-3. Controls:
-   - `+` : Zoom in
-   - `-` : Zoom out
-   - `q` : Quit application
-
-## Project Structure
-
+## 📦 Project Structure
 ```
-squat-counter/
-├── main.py              # Main application entry point
-├── requirements.txt     # Python dependencies
-├── README.md            # Project documentation
-├── src/                 # Source code
-│   ├── __init__.py
-│   ├── pose_estimator.py  # Pose detection logic
-│   ├── squat_counter.py   # Squat counter logic
-│   └── utils.py          # Utility functions
-├── assets/              # Images and demo files
-└── workout_data/        # Saved workout sessions
+fitness-tracker/
+├── exercises/           # Exercise implementations
+│   ├── base_exercise.py # Base exercise class
+│   ├── squat_counter.py # Squat counter implementation
+│   └── pushup_counter.py# Push-up counter implementation
+├── models/              # ML models
+│   └── pose_estimator.py# Pose estimation logic
+├── utils/               # Utility functions
+│   ├── ui_utils.py      # UI drawing utilities
+│   └── file_utils.py    # File operation utilities
+├── main.py              # Main application
+└── requirements.txt     # Python dependencies
 ```
 
-## Requirements
+## 🧠 How the Project Works (Detailed Walkthrough)
 
+### 1. Pose Detection
+- Uses MediaPipe's pose estimation model to detect 33 key body points
+- Tracks joints in real-time with high accuracy
+- Processes each frame to analyze body position
+
+### 2. Exercise Recognition
+- Detects specific exercise patterns (push-ups, squats)
+- Monitors joint angles and positions
+- Provides real-time feedback on form
+
+### 3. Rep Counting Logic
+```python
+# Simplified rep counting logic
+if per >= 95:  # Down position
+    if dir == 0:
+        count += 0.5
+        dir = 1
+elif per <= 5:  # Up position
+    if dir == 1:
+        count += 0.5
+        dir = 0
+```
+- Tracks full range of motion
+- Prevents false counts
+- Adjustable sensitivity
+
+### 4. Real-time Feedback
+- Visual progress bar
+- Form correction hints
+- Repetition counter
+- FPS display
+
+## 🚀 Getting Started
+
+### Prerequisites
 - Python 3.7+
-- OpenCV
-- MediaPipe
-- NumPy
-- Pandas
+- Webcam
+- Required packages (install via `requirements.txt`)
 
-## Contributing
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/vishwaspw/fitness-tracker.git
+cd fitness-tracker
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+# Install dependencies
+pip install -r requirements.txt
+```
 
-## License
+### Usage
+```bash
+# Start with push-ups
+python main.py --exercise pushup
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# Or try squats
+python main.py --exercise squat
+```
 
-## Acknowledgments
+## ✅ Project Summary
+| Feature | Description |
+|---------|-------------|
+| Library | MediaPipe, OpenCV, NumPy |
+| Input | Live webcam video feed |
+| Output | Pose landmarks, progress bar, rep count |
+| ML Model | MediaPipe Pose Estimation |
+| Applications | Fitness, Rehab, Posture Correction |
 
-- [MediaPipe](https://mediapipe.dev/) for the amazing pose estimation model
-- [OpenCV](https://opencv.org/) for computer vision capabilities
-- All contributors who helped improve this project
+## 🚀 Future Ideas
+- Add sound feedback for each rep
+- Save history of workout sessions
+- Detect poor form (e.g., bent knees, arched back)
+- Export stats (CSV, Graphs)
+- Support for more exercises
+
+## 👏 Credits
+- Original concept and implementation: [Abdelkareem Hossam](https://github.com/abdelkareem-ahmed)
+- Enhanced and modularized by: [Vishwas R](https://github.com/vishwaspw)
+- Squat counter implementation: [Vishwas R](https://github.com/vishwaspw)
+
+## 🙏 Acknowledgments
+- Thanks to the MediaPipe team for their amazing pose estimation model
+- Inspired by the fitness technology community
+
+---
+
+*Feel free to improve or extend it for other exercises like jumping jacks, pull-ups, or yoga!*
